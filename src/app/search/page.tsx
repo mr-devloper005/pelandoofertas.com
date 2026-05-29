@@ -102,7 +102,7 @@ export default async function SearchPage({
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {results.map((post) => {
             const task = getPostTaskKey(post);
-            const href = task ? buildPostUrl(task, post.slug) : buildPostUrl("classified", post.slug);
+            const href = task ? buildPostUrl(task, post.slug) : `/posts/${post.slug}`;
             return <TaskPostCard key={post.id} post={post} href={href} />;
           })}
         </div>
