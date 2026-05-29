@@ -26,12 +26,17 @@ const readUsers = (): LocalUser[] => {
 const saveUsers = (users: LocalUser[]) => window.localStorage.setItem(USERS_KEY, JSON.stringify(users))
 
 const saveSession = (user: Pick<LocalUser, 'name' | 'email'>) => {
-  window.localStorage.setItem(SESSION_KEY, JSON.stringify({ name: user.name, email: user.email, loggedInAt: new Date().toISOString() }))
+  window.localStorage.setItem(
+    SESSION_KEY,
+    JSON.stringify({ name: user.name, email: user.email, loggedInAt: new Date().toISOString() })
+  )
   window.dispatchEvent(new Event('slot4-auth-change'))
 }
 
-const inputClass = 'h-12 rounded-2xl border border-[var(--editable-border)] bg-white/85 px-4 text-base font-bold text-current outline-none transition placeholder:text-current/35 focus:border-current focus:bg-white'
-const buttonClass = 'inline-flex h-12 items-center justify-center rounded-2xl bg-current px-6 text-sm font-black uppercase tracking-[0.22em] text-white transition hover:-translate-y-0.5 disabled:opacity-60'
+const inputClass =
+  'h-12 rounded-[1.35rem] border border-black/10 bg-white/90 px-4 text-base font-bold text-current outline-none transition placeholder:text-current/35 focus:border-[var(--slot4-accent)] focus:bg-white'
+const buttonClass =
+  'inline-flex h-12 items-center justify-center rounded-full bg-[var(--slot4-dark-bg)] px-6 text-sm font-black uppercase tracking-[0.22em] text-white transition hover:-translate-y-0.5 disabled:opacity-60'
 
 export function EditableLocalLoginForm() {
   const router = useRouter()
@@ -46,7 +51,7 @@ export function EditableLocalLoginForm() {
     const user = readUsers().find((item) => item.email.toLowerCase() === normalizedEmail)
     if (!user || user.password !== password) {
       setStatus('error')
-      setMessage('No local account found with these details. Create an account first, then login.')
+      setMessage('No local account matches these details. Create an account first.')
       return
     }
     saveSession(user)
@@ -59,8 +64,10 @@ export function EditableLocalLoginForm() {
     <form className="mt-6 grid gap-4" onSubmit={submit}>
       <input className={inputClass} type="email" placeholder="Email address" value={email} onChange={(event) => setEmail(event.target.value)} required />
       <input className={inputClass} type="password" placeholder="Password" value={password} onChange={(event) => setPassword(event.target.value)} required />
-      {message ? <p className={`rounded-2xl px-4 py-3 text-sm font-bold ${status === 'success' ? 'bg-emerald-50 text-emerald-800' : 'bg-red-50 text-red-700'}`}>{message}</p> : null}
-      <button type="submit" className={buttonClass}>Continue</button>
+      {message ? <p className={`rounded-[1.25rem] px-4 py-3 text-sm font-bold ${status === 'success' ? 'bg-emerald-50 text-emerald-800' : 'bg-red-50 text-red-700'}`}>{message}</p> : null}
+      <button type="submit" className={buttonClass}>
+        Continue
+      </button>
     </form>
   )
 }
@@ -79,7 +86,7 @@ export function EditableLocalSignupForm() {
     const normalizedEmail = email.trim().toLowerCase()
     if (password.length < 4) {
       setStatus('error')
-      setMessage('Use at least 4 characters for local demo password.')
+      setMessage('Use at least 4 characters for the local demo password.')
       return
     }
     const users = readUsers()
@@ -101,8 +108,10 @@ export function EditableLocalSignupForm() {
       <input className={inputClass} placeholder="Full name" value={name} onChange={(event) => setName(event.target.value)} required />
       <input className={inputClass} type="email" placeholder="Email address" value={email} onChange={(event) => setEmail(event.target.value)} required />
       <input className={inputClass} type="password" placeholder="Password" value={password} onChange={(event) => setPassword(event.target.value)} required />
-      {message ? <p className={`rounded-2xl px-4 py-3 text-sm font-bold ${status === 'success' ? 'bg-emerald-50 text-emerald-800' : 'bg-red-50 text-red-700'}`}>{message}</p> : null}
-      <button type="submit" className={buttonClass}>Start now</button>
+      {message ? <p className={`rounded-[1.25rem] px-4 py-3 text-sm font-bold ${status === 'success' ? 'bg-emerald-50 text-emerald-800' : 'bg-red-50 text-red-700'}`}>{message}</p> : null}
+      <button type="submit" className={buttonClass}>
+        Start now
+      </button>
     </form>
   )
 }
