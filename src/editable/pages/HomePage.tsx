@@ -4,9 +4,9 @@ import { SITE_CONFIG, type TaskKey } from '@/lib/site-config'
 import { buildPageMetadata } from '@/lib/seo'
 import { fetchHomeTaskFeed, fetchHomeTimeSections, type HomeTimeSection } from '@/lib/task-data'
 import { pagesContent } from '@/editable/content/pages.content'
-import { editableDesignContract as dc } from '@/editable/layouts/design-contract'
 import type { SitePost } from '@/lib/site-connector'
 import { EditableHomeCta, EditableHomeHero, EditableMagazineSplit, EditableStoryRail, EditableTimeCollections } from '@/editable/sections/HomeSections'
+import { EditableSiteShell } from '@/editable/shell/EditableSiteShell'
 
 export const revalidate = 300
 
@@ -29,15 +29,16 @@ function uniquePosts(posts: SitePost[]) {
 }
 
 export default async function HomePage() {
-  const primaryTask = (SITE_CONFIG.tasks.find((task) => task.enabled)?.key || 'article') as TaskKey
-  const primaryRoute = SITE_CONFIG.taskViews[primaryTask] || `/${primaryTask}`
+  const primaryTask = 'classified' as TaskKey
+  const primaryRoute = '/classified'
   const taskFeed: TaskFeedItem[] = await fetchHomeTaskFeed(12, { timeoutMs: 2500 })
   const primaryPosts = uniquePosts(taskFeed.find(({ task }) => task.key === primaryTask)?.posts || taskFeed.flatMap(({ posts }) => posts)).slice(0, 24)
   const timeSections: HomeTimeSection[] = await fetchHomeTimeSections(primaryTask, { limit: 8, timeoutMs: 2500 })
   const baseUrl = SITE_CONFIG.baseUrl.replace(/\/$/, '')
 
   return (
-    <main className={dc.shell.page}>
+    <EditableSiteShell>
+      <main className="overflow-hidden">
       <SchemaJsonLd
         data={{
           '@context': 'https://schema.org',
@@ -56,6 +57,7 @@ export default async function HomePage() {
       <EditableMagazineSplit primaryTask={primaryTask} primaryRoute={primaryRoute} posts={primaryPosts} timeSections={timeSections} />
       <EditableTimeCollections primaryTask={primaryTask} primaryRoute={primaryRoute} posts={primaryPosts} timeSections={timeSections} />
       <EditableHomeCta />
-    </main>
+      </main>
+    </EditableSiteShell>
   )
 }
