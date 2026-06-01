@@ -36,7 +36,7 @@ export function TaskEmptyState({ taskLabel = 'posts', className }: { taskLabel?:
   return (
     <EmptyState
       className={className}
-      title={`No ${taskLabel} found`}
+      title={`No ${taskLabel} available yet`}
       description={`This area is ready for new ${taskLabel}, but there is nothing published here yet.`}
       actionLabel="Explore the site"
       actionHref="/"

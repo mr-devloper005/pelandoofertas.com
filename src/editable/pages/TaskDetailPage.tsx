@@ -382,7 +382,7 @@ function MapBox({ src, label }: { src: string; label: string }) {
   )
 }
 
-function ContactAction() {
+function ContactAction(_props?: { website?: string; phone?: string; email?: string }) {
   return (
     <div className="mt-5 rounded-[1.8rem] border border-black/10 bg-white p-5 shadow-[0_16px_48px_rgba(0,0,0,0.08)]">
       <p className="text-[11px] font-black uppercase tracking-[0.24em] text-black/45">Quick actions</p>
