@@ -31,7 +31,6 @@ export type TaskLayoutKey =
   | 'sbm-curation'
   | 'sbm-library'
   | 'sbm-board'
-  | (string & {})
 
 export type BrandPack = {
   key: BrandPackKey

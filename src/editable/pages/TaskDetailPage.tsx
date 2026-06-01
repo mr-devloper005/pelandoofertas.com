@@ -7,12 +7,9 @@ import {
   Building2,
   Camera,
   FileText,
-  Globe2,
-  Mail,
   MapPin,
   MessageCircle,
   Megaphone,
-  Phone,
   Send,
   UserRound,
 } from 'lucide-react'
