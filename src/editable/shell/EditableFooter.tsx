@@ -43,7 +43,7 @@ export function EditableFooter() {
             {[
               ['About', '/about'],
               ['Contact', '/contact'],
-              ...(session ? [['Create', '/create']] : [['Login', '/login'], ['Sign up', '/signup']]),
+              ...(session ? [['Create', '/create']] : []),
             ].map(([label, href]) => (
               <Link key={href} href={href} className="text-sm font-bold opacity-75 hover:opacity-100">{label}</Link>
             ))}
