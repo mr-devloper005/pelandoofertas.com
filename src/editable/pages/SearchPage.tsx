@@ -1,138 +1,176 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { ArrowRight, Filter, Search } from 'lucide-react'
+import { ArrowRight, Search } from 'lucide-react'
 import { buildPageMetadata } from '@/lib/seo'
-import { fetchSiteFeed } from '@/lib/site-connector'
+import { fetchSiteFeed, type SitePost } from '@/lib/site-connector'
 import { buildPostUrl, getPostTaskKey } from '@/lib/task-data'
-import { getMockPostsForTask } from '@/lib/mock-posts'
 import { SITE_CONFIG, type TaskKey } from '@/lib/site-config'
-import type { SitePost } from '@/lib/site-connector'
 import { EditableSiteShell } from '@/editable/shell/EditableSiteShell'
-import { pagesContent } from '@/editable/content/pages.content'
 
 export const revalidate = 3
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata({
     path: '/search',
-    title: pagesContent.search.metadata.title,
-    description: pagesContent.search.metadata.description,
+    title: 'Search posts',
+    description: 'Search posts, stories, listings, and useful resources from this site.',
   })
 }
 
 const stripHtml = (value: string) => value.replace(/<[^>]*>/g, ' ')
-const compactText = (value: unknown) => typeof value === 'string' ? stripHtml(value).replace(/\s+/g, ' ').trim().toLowerCase() : ''
-const getContent = (post: SitePost) => post.content && typeof post.content === 'object' ? post.content as Record<string, unknown> : {}
-const getImage = (post: SitePost) => {
-  const content = getContent(post)
-  const media = Array.isArray(post.media) ? post.media.find((item) => typeof item?.url === 'string')?.url : ''
-  const images = Array.isArray(content.images) ? content.images.find((item) => typeof item === 'string') as string | undefined : ''
-  return media || compactRaw(content.featuredImage) || compactRaw(content.image) || compactRaw(content.thumbnail) || images || ''
-}
-const compactRaw = (value: unknown) => typeof value === 'string' ? value.trim() : ''
-const summaryOf = (post: SitePost) => post.summary || compactRaw(getContent(post).description) || compactRaw(getContent(post).excerpt) || ''
-
-const matches = (post: SitePost, query: string, category: string, task: string) => {
-  const content = getContent(post)
-  const typeText = compactText(content.type)
-  if (typeText === 'comment') return false
-  const derivedTask = getPostTaskKey(post) || typeText
-  if (task && derivedTask !== task) return false
-  const categoryText = compactText(content.category)
-  const tagsText = compactText(Array.isArray(post.tags) ? post.tags.join(' ') : '')
-  if (category && !(categoryText || tagsText).includes(category)) return false
-  if (!query) return true
-  return [post.title, post.summary, content.description, content.body, content.excerpt, content.category, Array.isArray(post.tags) ? post.tags.join(' ') : '']
-    .some((value) => compactText(value).includes(query))
-}
-
-function SearchResultCard({ post, index }: { post: SitePost; index: number }) {
-  const task = getPostTaskKey(post) as TaskKey | null
-  const href = task ? buildPostUrl(task, post.slug) : `/article/${post.slug}`
-  const image = getImage(post)
-  const summary = summaryOf(post)
-  const taskLabel = SITE_CONFIG.tasks.find((item) => item.key === task)?.label || 'Post'
-  const strong = index % 5 === 0
+const compact = (value: unknown) =>
+  typeof value === 'string' ? stripHtml(value).replace(/\s+/g, ' ').trim() : ''
+const lower = (value: unknown) => compact(value).toLowerCase()
+const contentOf = (post: SitePost) =>
+  post.content && typeof post.content === 'object' ? (post.content as Record<string, unknown>) : {}
+const imageOf = (post: SitePost) => {
+  const content = contentOf(post)
+  const media = Array.isArray(post.media)
+    ? post.media.find((item) => item && typeof item.url === 'string')?.url
+    : ''
+  const gallery = Array.isArray(content.images)
+    ? (content.images.find((item) => typeof item === 'string') as string | undefined)
+    : ''
 
   return (
-    <Link href={href} className={`group block overflow-hidden rounded-[2rem] border border-[var(--editable-border)] bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-2xl ${strong ? 'md:col-span-2' : ''}`}>
+    media ||
+    compact(content.featuredImage) ||
+    compact(content.image) ||
+    compact(content.thumbnail) ||
+    gallery ||
+    ''
+  )
+}
+const summaryOf = (post: SitePost) => {
+  const content = contentOf(post)
+  return (
+    post.summary ||
+    compact(content.summary) ||
+    compact(content.description) ||
+    compact(content.excerpt) ||
+    compact(content.body)
+  )
+}
+const matches = (post: SitePost, query: string, task: string, category: string) => {
+  const content = contentOf(post)
+  const taskKey = getPostTaskKey(post)
+  if (task && taskKey !== task) return false
+
+  const categoryText = lower(content.category)
+  const tagsText = Array.isArray(post.tags) ? post.tags.join(' ').toLowerCase() : ''
+  if (category && !`${categoryText} ${tagsText}`.includes(category)) return false
+  if (!query) return true
+
+  return [
+    post.title,
+    post.summary,
+    content.title,
+    content.description,
+    content.body,
+    content.excerpt,
+    content.category,
+    Array.isArray(post.tags) ? post.tags.join(' ') : '',
+  ].some((item) => lower(item).includes(query))
+}
+
+function SearchResult({ post, index }: { post: SitePost; index: number }) {
+  const task = getPostTaskKey(post) as TaskKey | null
+  const href = task ? buildPostUrl(task, post.slug) : `/article/${post.slug}`
+  const image = imageOf(post)
+  const summary = summaryOf(post)
+  const taskLabel = SITE_CONFIG.tasks.find((item) => item.key === task)?.label || 'Post'
+
+  return (
+    <Link
+      href={href}
+      className={`group overflow-hidden rounded-[2rem] border border-black/10 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl ${index === 0 ? 'md:col-span-2' : ''}`}
+    >
       {image ? (
-        <div className={`relative overflow-hidden bg-black ${strong ? 'aspect-[16/7]' : 'aspect-[16/10]'}`}>
-          <img src={image} alt="" className="h-full w-full object-cover opacity-90 transition duration-500 group-hover:scale-105" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-          <span className="absolute left-4 top-4 rounded-full bg-white px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-black">{taskLabel}</span>
+        <div className="relative aspect-[16/9] overflow-hidden bg-neutral-100">
+          <img
+            src={image}
+            alt=""
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+          />
+          <span className="absolute left-4 top-4 rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-black shadow-sm">
+            {taskLabel}
+          </span>
         </div>
       ) : null}
       <div className="p-5 sm:p-6">
-        {!image ? <span className="rounded-full bg-[var(--editable-page-text,#211713)] px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-white">{taskLabel}</span> : null}
-        <h2 className="mt-4 line-clamp-3 text-2xl font-black leading-[0.95] tracking-[-0.06em] text-[var(--editable-page-text,#211713)]">{post.title}</h2>
-        {summary ? <p className="mt-4 line-clamp-3 text-sm font-semibold leading-7 text-[var(--editable-page-text,#211713)]/65">{summary}</p> : null}
-        <span className="mt-5 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] opacity-60 group-hover:opacity-100">Open result <ArrowRight className="h-4 w-4" /></span>
+        {!image ? (
+          <span className="rounded-full bg-black px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-white">
+            {taskLabel}
+          </span>
+        ) : null}
+        <h2 className="mt-4 line-clamp-3 text-2xl font-black leading-tight tracking-[-0.04em] text-neutral-950">
+          {post.title}
+        </h2>
+        {summary ? (
+          <p className="mt-3 line-clamp-3 text-sm font-semibold leading-7 text-neutral-600">
+            {stripHtml(summary)}
+          </p>
+        ) : null}
+        <span className="mt-5 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-neutral-500">
+          Open result <ArrowRight className="h-4 w-4" />
+        </span>
       </div>
     </Link>
   )
 }
 
-export default async function SearchPage({ searchParams }: { searchParams?: Promise<{ q?: string; category?: string; task?: string; master?: string }> }) {
+export default async function SearchPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ q?: string; task?: string; category?: string }>
+}) {
   const resolved = (await searchParams) || {}
-  const query = (resolved.q || '').trim()
-  const normalized = query.toLowerCase()
-  const category = (resolved.category || '').trim().toLowerCase()
+  const query = (resolved.q || '').trim().toLowerCase()
   const task = (resolved.task || '').trim().toLowerCase()
-  const useMaster = resolved.master !== '0'
-  const feed = await fetchSiteFeed(useMaster ? 1000 : 300, useMaster ? { fresh: true, category: category || undefined, task: task || undefined } : undefined)
-  const posts = feed?.posts?.length ? feed.posts : useMaster ? [] : SITE_CONFIG.tasks.filter((item) => item.enabled).flatMap((item) => getMockPostsForTask(item.key))
-  const results = posts.filter((post) => matches(post, normalized, category, task)).slice(0, normalized ? 80 : 36)
-  const enabledTasks = SITE_CONFIG.tasks.filter((item) => item.enabled)
+  const category = (resolved.category || '').trim().toLowerCase()
+  const feed = await fetchSiteFeed(80, { fresh: true, timeoutMs: 5000 })
+  const posts = (feed?.posts || []).filter((post) => matches(post, query, task, category)).slice(0, 48)
 
   return (
     <EditableSiteShell>
-      <main className="min-h-screen bg-[var(--editable-page-bg,#fff7ee)] text-[var(--editable-page-text,#2f1d16)]">
-        <section className="mx-auto max-w-[var(--editable-container)] px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
-          <div className="grid gap-8 rounded-[2.5rem] border border-[var(--editable-border)] bg-white/70 p-6 shadow-[0_30px_90px_rgba(15,23,42,0.08)] backdrop-blur md:grid-cols-[0.8fr_1.2fr] lg:p-10">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.28em] opacity-55">{pagesContent.search.hero.badge}</p>
-              <h1 className="mt-5 text-5xl font-black leading-[0.92] tracking-[-0.08em] sm:text-7xl">{pagesContent.search.hero.title}</h1>
-              <p className="mt-6 max-w-xl text-base font-semibold leading-8 opacity-70">{pagesContent.search.hero.description}</p>
-            </div>
-            <form action="/search" className="self-end rounded-[2rem] border border-[var(--editable-border)] bg-[var(--editable-page-bg,#fff7ee)] p-4 sm:p-5">
-              <input type="hidden" name="master" value="1" />
-              <label className="flex items-center gap-3 rounded-2xl border border-[var(--editable-border)] bg-white px-4 py-3">
-                <Search className="h-5 w-5 opacity-45" />
-                <input name="q" defaultValue={query} placeholder={pagesContent.search.hero.placeholder} className="min-w-0 flex-1 bg-transparent text-base font-bold outline-none placeholder:text-current/35" />
-              </label>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                <label className="flex items-center gap-2 rounded-2xl border border-[var(--editable-border)] bg-white px-4 py-3">
-                  <Filter className="h-4 w-4 opacity-45" />
-                  <input name="category" defaultValue={category} placeholder="Category" className="min-w-0 flex-1 bg-transparent text-sm font-bold outline-none placeholder:text-current/35" />
-                </label>
-                <select name="task" defaultValue={task} className="rounded-2xl border border-[var(--editable-border)] bg-white px-4 py-3 text-sm font-black outline-none">
-                  <option value="">All content types</option>
-                  {enabledTasks.map((item) => <option key={item.key} value={item.key}>{item.label}</option>)}
-                </select>
+      <main className="bg-[var(--editable-page-bg,#f8f4ee)] px-4 py-12 text-[var(--editable-page-text,#1f1713)] sm:px-6 lg:px-8">
+        <section className="mx-auto max-w-7xl">
+          <div className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-sm sm:p-8">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.24em] text-neutral-500">Search</p>
+                <h1 className="mt-3 text-4xl font-black tracking-[-0.06em] sm:text-6xl">
+                  Find posts faster.
+                </h1>
+                <p className="mt-4 max-w-2xl text-sm font-semibold leading-7 text-neutral-600">
+                  Search articles, listings, bookmarks, images, PDFs, and profiles from the live site feed.
+                </p>
               </div>
-              <button className="mt-3 inline-flex h-12 w-full items-center justify-center rounded-2xl bg-[var(--editable-page-text,#2f1d16)] px-6 text-sm font-black uppercase tracking-[0.18em] text-[var(--editable-page-bg,#fff7ee)] transition hover:-translate-y-0.5" type="submit">Search</button>
-            </form>
+              <form action="/search" className="flex w-full max-w-xl gap-3 rounded-full border border-black/10 bg-neutral-50 p-2">
+                <Search className="ml-3 mt-2.5 h-5 w-5 text-neutral-400" />
+                <input
+                  name="q"
+                  defaultValue={resolved.q || ''}
+                  placeholder="Search posts..."
+                  className="min-w-0 flex-1 bg-transparent text-sm font-bold outline-none"
+                />
+                <button className="rounded-full bg-black px-5 py-3 text-sm font-black text-white">Search</button>
+              </form>
+            </div>
           </div>
-
-          <div className="mt-10 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.24em] opacity-50">{results.length} results</p>
-              <h2 className="mt-2 text-3xl font-black tracking-[-0.06em]">{query ? `Results for “${query}”` : pagesContent.search.resultsTitle}</h2>
-            </div>
-            <Link href="/article" className="inline-flex items-center gap-2 rounded-full border border-[var(--editable-border)] bg-white px-5 py-3 text-sm font-black">Browse latest <ArrowRight className="h-4 w-4" /></Link>
+          <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {posts.map((post, index) => (
+              <SearchResult key={post.id || post.slug} post={post} index={index} />
+            ))}
           </div>
-
-          {results.length ? (
-            <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {results.map((post, index) => <SearchResultCard key={post.id || post.slug} post={post} index={index} />)}
+          {!posts.length ? (
+            <div className="mt-8 rounded-[2rem] border border-dashed border-black/20 bg-white p-10 text-center">
+              <h2 className="text-2xl font-black">No matching posts found.</h2>
+              <p className="mt-3 text-sm font-semibold text-neutral-500">
+                Try another keyword or browse the task pages from the navbar.
+              </p>
             </div>
-          ) : (
-            <div className="mt-8 rounded-[2rem] border border-dashed border-[var(--editable-border)] bg-white/70 p-10 text-center">
-              <p className="text-2xl font-black tracking-[-0.04em]">No matching posts found.</p>
-              <p className="mt-3 text-sm font-semibold opacity-60">Try a different keyword, task type, or category.</p>
-            </div>
-          )}
+          ) : null}
         </section>
       </main>
     </EditableSiteShell>
