@@ -226,15 +226,8 @@ function ClassifiedDetail({ post, related }: { post: SitePost; related: SitePost
         </div>
       </aside>
       <article className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-[0_16px_48px_rgba(0,0,0,0.08)] sm:p-8">
-        <div className="grid gap-4 lg:grid-cols-[1fr_0.85fr]">
-          <div className="rounded-[1.8rem] bg-[var(--slot4-accent)] p-6 text-white">
-            <p className="text-[11px] font-black uppercase tracking-[0.24em] text-white/70">Offer</p>
-            <h2 className="mt-4 font-serif text-4xl leading-[0.95] tracking-[-0.05em]">{post.title}</h2>
-            <p className="mt-4 text-[15px] leading-8 text-white/85">{summaryText(post) || getEditableExcerpt(post, 160)}</p>
-          </div>
-          <div className="overflow-hidden rounded-[1.8rem] border border-black/10 bg-black/5">
-            {images[0] ? <img src={images[0]} alt="" className="h-full w-full object-cover" /> : <div className="flex h-full min-h-[260px] items-center justify-center text-black/35"><Megaphone className="h-12 w-12" /></div>}
-          </div>
+        <div className="overflow-hidden rounded-[1.8rem] border border-black/10 bg-black/5">
+          {images[0] ? <img src={images[0]} alt="" className="h-full w-full object-cover" /> : <div className="flex h-full min-h-[260px] items-center justify-center text-black/35"><Megaphone className="h-12 w-12" /></div>}
         </div>
         <GalleryStrip images={images.slice(1)} label="Offer images" />
         <BodyContent post={post} />
