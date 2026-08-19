@@ -26,9 +26,7 @@ export function EditableNavbar() {
       <div className={`slot4-navbar border-b border-white/10 bg-[var(--slot4-header-bg)]`}>
         <div className="mx-auto flex min-h-[88px] w-full max-w-[1520px] items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center gap-4">
-            <span className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-[1.25rem] bg-white shadow-lg shadow-black/25">
-              <img src="/logo.png?v=20260529" alt={globalContent.site.name} className="h-14 w-14 object-contain" />
-            </span>
+            <img src="/logo.png?v=20260529" alt={globalContent.site.name} className="h-20 w-20 object-contain" />
             <span className="hidden sm:block">
               <span className="block text-[2rem] font-black tracking-[-0.08em] text-[#ef5246] leading-none">{globalContent.site.name}</span>
             </span>
