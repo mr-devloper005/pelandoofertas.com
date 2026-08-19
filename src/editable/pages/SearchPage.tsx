@@ -86,7 +86,7 @@ function SearchResult({ post, index }: { post: SitePost; index: number }) {
       className={`group overflow-hidden rounded-[2rem] border border-black/10 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl ${index === 0 ? 'md:col-span-2' : ''}`}
     >
       {image ? (
-        <div className="relative aspect-[16/9] overflow-hidden bg-neutral-100">
+        <div className="relative aspect-[16/9] overflow-hidden bg-[#dbd4cb]">
           <img
             src={image}
             alt=""
@@ -99,19 +99,19 @@ function SearchResult({ post, index }: { post: SitePost; index: number }) {
       ) : null}
       <div className="p-5 sm:p-6">
         {!image ? (
-          <span className="rounded-full bg-black px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-white">
+          <span className="rounded-full bg-[#090909] px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-white">
             {taskLabel}
           </span>
         ) : null}
-        <h2 className="mt-4 line-clamp-3 text-2xl font-black leading-tight tracking-[-0.04em] text-neutral-950">
+        <h2 className="mt-4 line-clamp-3 text-2xl font-black leading-tight tracking-[-0.04em] text-[#101010]">
           {post.title}
         </h2>
         {summary ? (
-          <p className="mt-3 line-clamp-3 text-sm font-semibold leading-7 text-neutral-600">
+          <p className="mt-3 line-clamp-3 text-sm font-semibold leading-7 text-[#4d463f]">
             {stripHtml(summary)}
           </p>
         ) : null}
-        <span className="mt-5 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-neutral-500">
+        <span className="mt-5 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-[#685f55]">
           Open result <ArrowRight className="h-4 w-4" />
         </span>
       </div>
@@ -133,28 +133,28 @@ export default async function SearchPage({
 
   return (
     <EditableSiteShell>
-      <main className="bg-[var(--editable-page-bg,#f8f4ee)] px-4 py-12 text-[var(--editable-page-text,#1f1713)] sm:px-6 lg:px-8">
+      <main className="bg-[var(--editable-page-bg,#f4f1ec)] px-4 py-12 text-[var(--editable-page-text,#101010)] sm:px-6 lg:px-8">
         <section className="mx-auto max-w-7xl">
           <div className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-sm sm:p-8">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.24em] text-neutral-500">Search</p>
+                <p className="text-xs font-black uppercase tracking-[0.24em] text-[#685f55]">Search</p>
                 <h1 className="mt-3 text-4xl font-black tracking-[-0.06em] sm:text-6xl">
                   Find posts faster.
                 </h1>
-                <p className="mt-4 max-w-2xl text-sm font-semibold leading-7 text-neutral-600">
+                <p className="mt-4 max-w-2xl text-sm font-semibold leading-7 text-[#4d463f]">
                   Search articles, listings, bookmarks, images, PDFs, and profiles from the live site feed.
                 </p>
               </div>
-              <form action="/search" className="flex w-full max-w-xl gap-3 rounded-full border border-black/10 bg-neutral-50 p-2">
-                <Search className="ml-3 mt-2.5 h-5 w-5 text-neutral-400" />
+              <form action="/search" className="flex w-full max-w-xl gap-3 rounded-full border border-black/10 bg-[#fbf7f2] p-2">
+                <Search className="ml-3 mt-2.5 h-5 w-5 text-black/40" />
                 <input
                   name="q"
                   defaultValue={resolved.q || ''}
                   placeholder="Search posts..."
                   className="min-w-0 flex-1 bg-transparent text-sm font-bold outline-none"
                 />
-                <button className="rounded-full bg-black px-5 py-3 text-sm font-black text-white">Search</button>
+                <button className="rounded-full bg-[#090909] px-5 py-3 text-sm font-black text-white">Search</button>
               </form>
             </div>
           </div>
@@ -166,7 +166,7 @@ export default async function SearchPage({
           {!posts.length ? (
             <div className="mt-8 rounded-[2rem] border border-dashed border-black/20 bg-white p-10 text-center">
               <h2 className="text-2xl font-black">No matching posts found.</h2>
-              <p className="mt-3 text-sm font-semibold text-neutral-500">
+              <p className="mt-3 text-sm font-semibold text-[#685f55]">
                 Try another keyword or browse the task pages from the navbar.
               </p>
             </div>

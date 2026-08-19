@@ -21,21 +21,21 @@ export default function CreatePage() {
 
   return (
     <EditableSiteShell>
-      <main className="bg-[var(--editable-page-bg,#f8f4ee)] px-4 py-12 text-[var(--editable-page-text,#1f1713)] sm:px-6 lg:px-8">
+      <main className="bg-[var(--editable-page-bg,#f4f1ec)] px-4 py-12 text-[var(--editable-page-text,#101010)] sm:px-6 lg:px-8">
         <section className="mx-auto max-w-7xl">
           <div className="grid overflow-hidden rounded-[2.5rem] border border-black/10 bg-white shadow-sm lg:grid-cols-[0.95fr_1.05fr]">
             <div className="p-8 sm:p-10 lg:p-12">
-              <p className="text-xs font-black uppercase tracking-[0.26em] text-neutral-500">
+              <p className="text-xs font-black uppercase tracking-[0.26em] text-[#685f55]">
                 {pagesContent.create.hero.badge}
               </p>
               <h1 className="mt-4 max-w-2xl text-4xl font-black leading-[0.95] tracking-[-0.07em] sm:text-6xl">
                 {pagesContent.create.hero.title}
               </h1>
-              <p className="mt-6 max-w-xl text-sm font-semibold leading-8 text-neutral-600">
+              <p className="mt-6 max-w-xl text-sm font-semibold leading-8 text-[#4d463f]">
                 {pagesContent.create.hero.description}
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link href="/login" className="inline-flex items-center gap-2 rounded-full bg-black px-5 py-3 text-sm font-black text-white">
+                <Link href="/login" className="inline-flex items-center gap-2 rounded-full bg-[#090909] px-5 py-3 text-sm font-black text-white">
                   Login to create <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link href="/signup" className="inline-flex items-center gap-2 rounded-full border border-black/10 px-5 py-3 text-sm font-black text-black">
@@ -43,7 +43,7 @@ export default function CreatePage() {
                 </Link>
               </div>
             </div>
-            <div className="border-t border-black/10 bg-neutral-950 p-6 text-white lg:border-l lg:border-t-0 sm:p-8">
+            <div className="border-t border-black/10 bg-[#090909] p-6 text-white lg:border-l lg:border-t-0 sm:p-8">
               <div className="grid gap-4 sm:grid-cols-2">
                 {tasks.map((task, index) => {
                   const Icon = taskIcon[index % taskIcon.length]
@@ -61,23 +61,23 @@ export default function CreatePage() {
             </div>
           </div>
           <form className="mt-8 grid gap-5 rounded-[2rem] border border-black/10 bg-white p-6 shadow-sm sm:p-8 lg:grid-cols-2">
-            <label className="grid gap-2 text-xs font-black uppercase tracking-[0.18em] text-neutral-500">
+            <label className="grid gap-2 text-xs font-black uppercase tracking-[0.18em] text-[#685f55]">
               Title
               <input className="rounded-2xl border border-black/10 px-4 py-3 text-sm font-bold normal-case tracking-normal text-black outline-none" placeholder="Add post title" />
             </label>
-            <label className="grid gap-2 text-xs font-black uppercase tracking-[0.18em] text-neutral-500">
+            <label className="grid gap-2 text-xs font-black uppercase tracking-[0.18em] text-[#685f55]">
               Target URL
               <input className="rounded-2xl border border-black/10 px-4 py-3 text-sm font-bold normal-case tracking-normal text-black outline-none" placeholder="https://example.com" />
             </label>
-            <label className="grid gap-2 text-xs font-black uppercase tracking-[0.18em] text-neutral-500 lg:col-span-2">
+            <label className="grid gap-2 text-xs font-black uppercase tracking-[0.18em] text-[#685f55] lg:col-span-2">
               Description
               <textarea className="min-h-36 rounded-2xl border border-black/10 px-4 py-3 text-sm font-bold normal-case tracking-normal text-black outline-none" placeholder="Write the post content here..." />
             </label>
             <div className="lg:col-span-2">
-              <button type="button" className="rounded-full bg-black px-6 py-3 text-sm font-black text-white">
+              <button type="button" className="rounded-full bg-[#090909] px-6 py-3 text-sm font-black text-white">
                 Save draft locally
               </button>
-              <p className="mt-3 text-xs font-semibold text-neutral-500">
+              <p className="mt-3 text-xs font-semibold text-[#685f55]">
                 This editable page is ready for your final create flow styling and field changes.
               </p>
             </div>

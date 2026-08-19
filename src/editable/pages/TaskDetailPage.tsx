@@ -22,7 +22,7 @@ import { getTaskConfig, type TaskKey } from '@/lib/site-config'
 import type { SitePost } from '@/lib/site-connector'
 import { EditableSiteShell } from '@/editable/shell/EditableSiteShell'
 import { getVisualPreset, visualSystem } from '@/editable/theme/visual-system'
-import { CompactIndexCard, getEditableExcerpt, postHref } from '@/editable/cards/PostCards'
+import { CompactIndexCard, postHref } from '@/editable/cards/PostCards'
 
 export const revalidate = 3
 
@@ -92,7 +92,7 @@ const stripHtml = (value: string) =>
 const summaryText = (post: SitePost) => stripHtml(post.summary || asText(getContent(post).description) || asText(getContent(post).excerpt) || '')
 const categoryOf = (post: SitePost, fallback: string) => asText(getContent(post).category) || post.tags?.[0] || fallback
 
-const mapSrcFor = (post: SitePost) => {
+const mapSrcFor = (_post: SitePost) => {
   return ''
 }
 

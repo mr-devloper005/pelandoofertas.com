@@ -101,7 +101,7 @@ export async function EditableTaskArchiveRoute({
 }
 
 export function TaskArchiveView({ task, posts, pagination, category, basePath }: { task: TaskKey; posts: SitePost[]; pagination: SiteFeedPagination; category: string; basePath: string }) {
-  const taskConfig = getTaskConfig(task)
+  const _taskConfig = getTaskConfig(task)
   const voice = taskPageVoices.classified
   const preset = getVisualPreset(visualSystem.recommendedPreset as any)
   const page = pagination.page || 1
